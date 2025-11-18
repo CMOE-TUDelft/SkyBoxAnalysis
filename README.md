@@ -25,7 +25,7 @@ Multi-language analysis toolbox for FSS (Floating Submerged Structures) datasets
 
 ### Python
 - **Package**: `skyboxlib`
-- **Documentation**: [Python API Docs](docs/python/index.html)
+- **Documentation**: [Python API Docs](https://cmoe-tudelft.github.io/SkyBoxAnalysis/python/skyboxlib.html)
 - **Example**: [example_analysis.py](../python/scripts/example_analysis.py)
 - **Install**: `pip install -e ./python`
 
