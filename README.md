@@ -1,22 +1,3 @@
-# SkyBoxAnalysis
-
-[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://cmoe-tudelft.github.io/SkyBoxAnalysis/)
-
-
-Multi-language analysis toolbox for FSS datasets (Python, MATLAB, Julia).
-
-## Layout
-
-- `python/` – Python package `fsslib` + helper scripts
-- `matlab/` – MATLAB package `+fss` and example scripts
-- `julia/` – Julia package `FSSLib` and example scripts
-- `data/` – raw and processed data (not versioned by default)
-- `notebooks/` – Jupyter and Julia notebooks
-- `env/` – environment files (`environment.yml`, etc.)
-
-See `python/scripts/example_analysis.py`, `matlab/scripts/run_example.m`,
-and `julia/scripts/run_example.jl` for starting points.
-
 # SkyBox Analysis
 
 Multi-language analysis toolbox for FSS (Floating Submerged Structures) datasets.
@@ -24,9 +5,11 @@ Multi-language analysis toolbox for FSS (Floating Submerged Structures) datasets
 ## Languages & Documentation
 
 ### Python
+
+[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://cmoe-tudelft.github.io/SkyBoxAnalysis/python/skyboxlib.html)
+
 - **Package**: `skyboxlib`
-- **Documentation**: [Python API Docs](https://cmoe-tudelft.github.io/SkyBoxAnalysis/python/skyboxlib.html)
-- **Example**: [example_analysis.py](../python/scripts/example_analysis.py)
+- **Example**: [example_analysis.py](./notebooks/python/example_analysis.py)
 - **Install**: `pip install -e ./python`
 
 ### Julia  
