@@ -1,0 +1,17 @@
+**/constant/polyMesh
+
+# Parallel processing outputs
+**/processor*/
+
+# pycache
+**/__pycache__
+
+# Build artifacts
+*.dep
+Make/                      
+*.so
+*.o
+
+# Python packaging metadata
+*.egg-info/
+*.egg-info

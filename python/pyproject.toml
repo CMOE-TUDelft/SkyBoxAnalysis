@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "skyboxlib"
+version = "0.1.0"
+description = "Analysis tools for SkyBox datasets"
+authors = [
+    { name = "Shagun Agarwal", email = "shagun.1994@gmail.com" }, 
+    { name = "Oriol Colomés", email = "J.O.ColomesGene@tudelft.nl" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "hdf5storage",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
