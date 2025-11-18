@@ -23,19 +23,19 @@ Multi-language analysis toolbox for FSS (Floating Submerged Structures) datasets
 
 ## Languages & Documentation
 
-### 🐍 Python
+### Python
 - **Package**: `skyboxlib`
-- **Documentation**: [Python API Docs](python/index.html)
+- **Documentation**: [Python API Docs](docs/python/index.html)
 - **Example**: [example_analysis.py](../python/scripts/example_analysis.py)
 - **Install**: `pip install -e ./python`
 
-### 🔬 Julia  
+### Julia  
 - **Package**: `FSSLib`
 - **Source**: [SkyBoxLib.jl](../julia/src/SkyBoxLib.jl)
 - **Example**: [run_example.jl](../julia/scripts/run_example.jl)
 - **Setup**: `julia --project=julia`
 
-### 🔧 MATLAB
+### MATLAB
 - **Package**: `+fss`
 - **Functions**: [fss/](../matlab/fss/)
 - **Example**: [run_example.m](../matlab/scripts/run_example.m)
