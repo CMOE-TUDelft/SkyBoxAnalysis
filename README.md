@@ -1,4 +1,7 @@
-# fss-analysis
+# SkyBoxAnalysis
+
+[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://shagun751.github.io/SkyBoxAnalysis/)
+
 
 Multi-language analysis toolbox for FSS datasets (Python, MATLAB, Julia).
 
