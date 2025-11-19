@@ -1,6 +1,6 @@
 # SkyBox Analysis
 
-Multi-language analysis toolbox for FSS (Floating Submerged Structures) datasets.
+Multi-language analysis toolbox for SkyBox wave run-up and impact dataset.
 
 ## Languages & Documentation
 
@@ -8,13 +8,13 @@ Multi-language analysis toolbox for FSS (Floating Submerged Structures) datasets
 
 [![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://cmoe-tudelft.github.io/SkyBoxAnalysis/python/skyboxlib.html)
 
-- **Package**: `skyboxlib`
+- **Package**: `skyboxdatapy`
 - **Example**: [example_analysis.py](./notebooks/python/example_analysis.py)
 - **Install**: `pip install -e ./python`
 
 ### Julia  
 - **Package**: `FSSLib`
-- **Source**: [SkyBoxLib.jl](../julia/src/SkyBoxLib.jl)
+- **Source**: [SkyBoxData.jl](../julia/src/SkyBoxLib.jl)
 - **Example**: [run_example.jl](../julia/scripts/run_example.jl)
 - **Setup**: `julia --project=julia`
 
@@ -34,6 +34,11 @@ pip install -e ./python
 python python/scripts/example_analysis.py
 ```
 
+Create the auto-documentation using
+```bash
+pdoc -o docs/python/ python/skyboxdatapy
+```
+
 **Julia:**
 ```bash
 julia --project=julia
@@ -49,12 +54,12 @@ run('matlab/scripts/run_example.m');
 ## Project Structure
 
 ```
-├── python/          # Python package (skyboxlib)
-├── julia/           # Julia package (FSSLib) 
+├── python/          # Python package (skyboxdatapy)
+├── julia/           # Julia package (SkyBoxData.jl) 
 ├── matlab/          # MATLAB package (+fss)
 ├── data/            # Raw and processed data
-├── notebooks/       # Jupyter and Julia notebooks
-└── env/             # Environment files
+├── notebooks/       # Jupyter Python and Julia notebooks
+└── env/             # Environment files for Anaconda
 ```
 
 ## Contributing
@@ -64,5 +69,3 @@ run('matlab/scripts/run_example.m');
 3. Update this README when adding features
 
 ---
-
-For detailed API documentation, see [Python API Docs](python/index.html).
