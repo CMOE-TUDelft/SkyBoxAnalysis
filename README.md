@@ -6,7 +6,7 @@ Multi-language analysis toolbox for SkyBox wave run-up and impact dataset.
 
 ### Python
 
-[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://cmoe-tudelft.github.io/SkyBoxAnalysis/python/skyboxlib.html)
+[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://cmoe-tudelft.github.io/SkyBoxAnalysis/python/skyboxdatapy.html)
 
 - **Package**: `skyboxdatapy`
 - **Example**: [example_analysis.py](./notebooks/python/example_analysis.py)
