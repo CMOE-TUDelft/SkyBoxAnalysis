@@ -7,6 +7,47 @@ data files in various formats, particularly HDF5 MATLAB files.
 import pathlib
 import hdf5storage
 import numpy as np
+import glob
+
+
+# ==============================================================================
+
+def find_unique_file(
+        pathPattern: str, 
+        testName: str, 
+        extension: str = "xlsx") -> str:
+    """Find a single file matching a pattern and test name.
+    
+    Args:
+        pathPattern: Path pattern with wildcards (e.g., "../data_nosync/*/Measure_XLS/")
+        testName: Test name to search for
+        extension: File extension to search for (default: "xlsx")
+        
+    Returns:
+        Full path to the matching file
+        
+    Raises:
+        ValueError: If no files or multiple files are found
+    
+    Examples:
+        >>> find_unique_file("../data_nosync/*/Measure_XLS/", "Test001", "xlsx")
+        '../data_nosync/d0910/Measure_XLS/Test001_results.xlsx'
+        
+        >>> find_unique_file("./measurements/*/", "sensor_data", "mat")
+        './measurements/2024/sensor_data_final.mat'
+    """
+
+    testFileName = f"{pathPattern}{testName}*.{extension}"   
+    files = glob.glob(testFileName)        
+    
+    if len(files) != 1:
+        error_msg = f"Expected 1 file for test case {testName}, found {len(files)}"
+        if files:
+            error_msg += f"\nFiles found:\n"
+            error_msg += "\n".join(files)
+        raise ValueError(error_msg)
+
+    return files[0]
 
 
 # ==============================================================================
@@ -34,7 +75,7 @@ def save_hdf5_mat(path: pathlib.Path, data: dict):
         print("=== Successfully saved using hdf5storage (nested structure with additional options) ===\n")
     
     except Exception as e:
-        print(f"hdf5storage (nested with options) failed: {e}")
+        raise RuntimeError(f"hdf5storage (nested with options) failed:\n{e}")
 
 
 # ==============================================================================
@@ -65,8 +106,7 @@ def load_hdf5_mat(path: pathlib.Path) -> dict:
         return data2
     
     except Exception as e:
-        print(f"hdf5storage (with options) failed: {e}")
-        return {}
+        raise RuntimeError(f"hdf5storage (with options) failed:\n{e}")
 
 
 # ==============================================================================
@@ -106,7 +146,7 @@ def print_headers(data: dict):
         print("=== End of headers ===\n")
     
     except Exception as e:
-        print(f"Error loading hdf5 nested file: {e}")
+        raise RuntimeError(f"Error loading hdf5 nested file:\n{e}")
 
 
 # ==============================================================================
@@ -129,8 +169,7 @@ def convert_matStrArray_to_str(matStrArray) -> str:
             return str(matStrArray)
     
     except Exception as e:
-        print(f"Error converting MATLAB string array: {e}")
-        return ""
+        raise RuntimeError(f"Error converting MATLAB string array:\n{e}")
     
     
 # ==============================================================================
