@@ -4,7 +4,7 @@
 """
 
 
-from .io import *
-from .postprocess import *
-from .spec import *
-from .utils import *
+from . import io
+from . import postprocess
+from . import spec
+from . import utils
