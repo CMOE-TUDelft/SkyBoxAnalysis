@@ -1,35 +1,34 @@
-"""
-Compute the single-sided amplitude and power spectrum of a signal.
-
-Parameters
-----------
-wv_ele : array-like
-    Input signal samples (1D array).
-fs : float
-    Sampling frequency of the input signal in Hz.
-
-Returns
--------
-fHalf : ndarray
-    Array of frequency (Hz) for the single-sided spectrum.
-fAmp : ndarray
-    Single-sided amplitude spectrum of the input signal.
-fS : ndarray
-    Single-sided power spectral density (PSD) of the input signal.
-
-Notes
------
-- The function ensures the input signal length is even for FFT computation.
-- The amplitude spectrum is normalized and scaled for single-sided representation.
-- The power spectral density is computed per frequency bin.
-- Also prints sample length, frequency resolution, and maximum frequency.
-
-"""
-
 import numpy as np
 
 def get_single_sided_spectrum(wv_ele, fs):
-    
+    """
+    Compute the single-sided amplitude and power spectrum of a signal.
+
+    Parameters
+    ----------
+    wv_ele : array-like
+        Input signal samples (1D array).
+    fs : float
+        Sampling frequency of the input signal in Hz.
+
+    Returns
+    -------
+    fHalf : ndarray
+        Array of frequency (Hz) for the single-sided spectrum.
+    fAmp : ndarray
+        Single-sided amplitude spectrum of the input signal.
+    fS : ndarray
+        Single-sided power spectral density (PSD) of the input signal.
+
+    Notes
+    -----
+    - The function ensures the input signal length is even for FFT computation.
+    - The amplitude spectrum is normalized and scaled for single-sided representation.
+    - The power spectral density is computed per frequency bin.
+    - Also prints sample length, frequency resolution, and maximum frequency.
+
+    """
+
     sz = (len(wv_ele) // 2) * 2  # Make it even
     wv_ele = wv_ele[:sz]
 
