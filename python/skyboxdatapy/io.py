@@ -7,39 +7,54 @@ data files in various formats, particularly HDF5 MATLAB files.
 import pathlib
 import hdf5storage
 import numpy as np
-import glob
+import xarray as xr
+import pandas as pd
+from pathlib import Path
 
 
 # ==============================================================================
 
+probe_names = [
+    "WG01", "WG02", "WG03", "WG04",
+    "WG05", "WG06", "WG07", "WG08", "WG09",
+    "Mo01", "Mo02", "Mo03", "Mo04",
+    "Mo05", "Mo06", "Mo07", "Mo08",
+    "LED-chan100" ]
+
+# ==============================================================================
+
 def find_unique_file(
-        pathPattern: str, 
+        root_dir: str, 
         testName: str, 
-        extension: str = "xlsx") -> str:
-    """Find a single file matching a pattern and test name.
+        ext :str ="*") -> str:
+    """Find a single file matching a pattern in a directory tree.
+    
+    Recursively searches through a directory and its subdirectories for files 
+    matching the specified test name and extension. Expects exactly one match.
     
     Args:
-        pathPattern: Path pattern with wildcards (e.g., "../data_nosync/*/Measure_XLS/")
-        testName: Test name to search for
-        extension: File extension to search for (default: "xlsx")
+        root_dir: Root directory to start the recursive search from
+        testName: Test name pattern to match at the beginning of filenames
+        ext: File extension to match (default: "*" for any extension)
         
     Returns:
-        Full path to the matching file
+        Path to the single file found matching the pattern
         
     Raises:
         ValueError: If no files or multiple files are found
     
     Examples:
-        >>> find_unique_file("../data_nosync/*/Measure_XLS/", "Test001", "xlsx")
-        '../data_nosync/d0910/Measure_XLS/Test001_results.xlsx'
+        >>> find_unique_file("/data", "experiment_001", "csv")
+        '/data/experiment_001_results.csv'
         
-        >>> find_unique_file("./measurements/*/", "sensor_data", "mat")
-        './measurements/2024/sensor_data_final.mat'
+        >>> find_unique_file("/data", "test_", "txt")
+        ValueError: Expected 1 file for test case test_, found 0
     """
-
-    testFileName = f"{pathPattern}{testName}*.{extension}"   
-    files = glob.glob(testFileName)        
     
+    pattern = f"{testName}*.{ext}" 
+    files = list(Path(root_dir).rglob(pattern))
+    files = [str(f) for f in files]
+
     if len(files) != 1:
         error_msg = f"Expected 1 file for test case {testName}, found {len(files)}"
         if files:
@@ -109,67 +124,65 @@ def load_hdf5_mat(path: pathlib.Path) -> dict:
         raise RuntimeError(f"hdf5storage (with options) failed:\n{e}")
 
 
+
 # ==============================================================================
 
-def print_headers(data: dict):
+def load_case(file,
+    *,probe_names=probe_names) -> dict:
     """
-    Print a short, human-readable summary of top-level entries in an HDF5-like dict.
-
+    Load a case from an HDF5 MAT file and convert probe data to xarray format.
     Args:
-        data (dict): mapping of top-level names to values (e.g., groups/arrays).
-
-    Notes:
-        Shows key names, value types, and structured-array field names when present.
+        file: Path to the HDF5 MAT file to load.
+        probe_names: Names of probes to use when converting to xarray format.
+    Returns:
+        dict: Dictionary containing the loaded data, with DefaultData and MP3 entries
+              converted to xarray datasets, and other entries preserved as-is.
     """
+
     
-    print("\n=== Listing headers ===")
-    try:        
-        print("Top-level keys:", list(data.keys()))
+    loaded_mat = load_hdf5_mat(file)
+
+    ret_mat = {}
+
+    for l1key, l1val in loaded_mat.items():
         
-        for l1Key, l1 in data.items():
-            print("\nTop-level:", l1Key, "-> type:", type(l1))        
-
-            # If it's a numpy structured array, dtype.names contains field names
-            if isinstance(l1, np.ndarray):
-                names = getattr(l1.dtype, "names", None)
-                if names:
-                    print("  structured array fields:", names)
-                    for f in names:
-                        print("   -", f)
-            elif isinstance(l1, dict):
-                for key in l1:
-                    print("   -", key)
-            else:
-                # Fallback: print repr
-                print("  value repr:", repr(l1)[:200])
-
-        print("=== End of headers ===\n")
+        if (l1key == "DefaultData") or ("MP3" in l1key):
+            ds_xr = convert_dict_to_xarray(l1val, 
+                probe_names=probe_names)
+            ret_mat.update({l1key: ds_xr})
+        
+        else:
+            ret_mat.update({l1key: l1val})
     
-    except Exception as e:
-        raise RuntimeError(f"Error loading hdf5 nested file:\n{e}")
+    return ret_mat
 
 
 # ==============================================================================
 
-def convert_matStrArray_to_str(matStrArray) -> str:
+def convert_dict_to_xarray(ds: dict, * , probe_names = probe_names ) -> xr.Dataset:        
     """
-    Convert MATLAB character array loaded from HDF5 to Python string.
+    Convert a dictionary to an xarray Dataset.
     
     Args:
-        matStrArray: MATLAB character array (e.g., numpy array of chars).  
+        ds: Dictionary containing time series data with 'Time' key and probe data
+        probe_names: List of probe names to be converted to data variables in the xarray Dataset
+            - Default value: predefined list of probe names
+    Returns:
+        xr.Dataset: Dataset with Time coordinate, probe data as variables, and other keys as attributes
     """
-
-    try:
-        # MATLAB char arrays are often 2D arrays of single-character strings
-        if isinstance(matStrArray, np.ndarray):
-            # Flatten and join characters        
-            chars = matStrArray.flatten()
-            return ''.join(chars)
-        else:
-            return str(matStrArray)
     
-    except Exception as e:
-        raise RuntimeError(f"Error converting MATLAB string array:\n{e}")
+
+    ds_xr = xr.Dataset( coords={'Time': ds['Time']} )
+
+    for l1key, l1val in ds.items():
+        if l1key == 'Time':
+            continue
+        elif l1key in probe_names:
+            ds_xr[l1key] = ( 'Time', l1val )
+        else:
+            ds_xr.attrs[l1key] = l1val
+
+    return ds_xr
     
     
 # ==============================================================================
@@ -203,11 +216,11 @@ def cleanAttributes(l1: np.ndarray) -> dict:
     allAttributes = list(names)                
     unconvertedAttributes = [f for f in names if f not in convertedAttributes]   
 
-    l2.update({
-        'allAttributes': allAttributes,
-        'convertedAttributes': convertedAttributes,
-        'unconvertedAttributes': unconvertedAttributes
-    })
+    # l2.update({
+    #     'allAttributes': allAttributes,
+    #     'convertedAttributes': convertedAttributes,
+    #     'unconvertedAttributes': unconvertedAttributes
+    # })
 
     for f in convertedAttributes:
         lattr = l1[f].flatten()
@@ -223,3 +236,6 @@ def cleanAttributes(l1: np.ndarray) -> dict:
         l2.update({f: newval})
     
     return l2
+
+
+# ==============================================================================
