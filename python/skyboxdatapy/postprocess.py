@@ -1,39 +1,40 @@
 import numpy as np
+import xarray as xr
 
 # ==============================================================================
 
-def updated_LED_transition_indices(dfIn):
-    """       
-    This function identifies the indices where LED signal transitions occur (from 0 to 1 and from 1 to 0)
-    and adds them to the input dictionary.
+def updated_LED_transition_indices(dfIn: xr.Dataset):
+    """
+    Identifies LED transition indices and adds them as dataset attributes.
     
     Parameters
     ----------
-    dfIn : dict
-        Input dictionary containing 'Time' and 'LED-chan100' keys with array-like values.
-        The dictionary is modified in-place.
+    dfIn : xr.Dataset
+        Dataset with 'Time' and 'LED-chan100' variables. Modified in-place.
     
-    Returns
-    -------
-    None
-        The function modifies dfIn in-place by adding two new keys:
-        - 'LED_index_0_to_1': int
-            Index of the first occurrence where LED signal transitions from 0 to 1
-        - 'LED_index_1_to_0': int
-            Index of the last occurrence where LED signal transitions from 1 to 0
+    Attributes Added
+    ----------------
+    LED_index_0_to_1 : int
+        Index of LED transition from 0 to 1
+    LED_index_1_to_0 : int
+        Index of LED transition from 1 to 0
+    LED_time_0_to_1 : float
+        Time value at LED transition from 0 to 1
+    LED_time_1_to_0 : float
+        Time value at LED transition from 1 to 0
     """
+
     
-    t = dfIn['Time']
-    led = dfIn['LED-chan100']
+    t = dfIn['Time'].values
+    led = dfIn['LED-chan100'].values
 
     ind = np.where(led > 0)
     ind = ind[0]
 
-    dfIn.update(
-        {
-            'LED_index_0_to_1': ind[0], 
-            'LED_index_1_to_0': ind[-1]            
-        } )
+    dfIn.attrs['LED_index_0_to_1'] = ind[0]
+    dfIn.attrs['LED_index_1_to_0'] = ind[-1]
+    dfIn.attrs['LED_time_0_to_1'] = t[ind[0]]
+    dfIn.attrs['LED_time_1_to_0'] = t[ind[-1]]
 
 
 # ==============================================================================
