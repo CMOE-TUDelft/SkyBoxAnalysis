@@ -16,6 +16,7 @@ dependencies = [
     "pandas",
     "matplotlib",
     "hdf5storage",
+    "xarray",
 ]
 
 [tool.setuptools.packages.find]

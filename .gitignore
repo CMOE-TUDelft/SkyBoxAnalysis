@@ -1,5 +1,8 @@
 **/constant/polyMesh
 
+# Mac
+.DS_Store
+
 # Parallel processing outputs
 **/processor*/
 

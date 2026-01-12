@@ -3,7 +3,7 @@ import xarray as xr
 
 # ==============================================================================
 
-def updated_LED_transition_indices(dfIn: xr.Dataset):
+def update_LED_transition_indices(dfIn: xr.Dataset):
     """
     Identifies LED transition indices and adds them as dataset attributes.
     
@@ -31,10 +31,18 @@ def updated_LED_transition_indices(dfIn: xr.Dataset):
     ind = np.where(led > 0)
     ind = ind[0]
 
-    dfIn.attrs['LED_index_0_to_1'] = ind[0]
-    dfIn.attrs['LED_index_1_to_0'] = ind[-1]
-    dfIn.attrs['LED_time_0_to_1'] = t[ind[0]]
-    dfIn.attrs['LED_time_1_to_0'] = t[ind[-1]]
+    if(len(ind) == 0):
+        print("No LED transitions found in 'LED-chan100' data.")
+        dfIn.attrs['LED_index_0_to_1'] = 0
+        dfIn.attrs['LED_index_1_to_0'] = 0
+        dfIn.attrs['LED_time_0_to_1'] = 0
+        dfIn.attrs['LED_time_1_to_0'] = 0
+    else:
+        dfIn.attrs['LED_index_0_to_1'] = ind[0]
+        dfIn.attrs['LED_index_1_to_0'] = ind[-1]
+        dfIn.attrs['LED_time_0_to_1'] = t[ind[0]]
+        dfIn.attrs['LED_time_1_to_0'] = t[ind[-1]]
+        
 
 
 # ==============================================================================
