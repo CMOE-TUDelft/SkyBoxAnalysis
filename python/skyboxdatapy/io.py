@@ -14,11 +14,18 @@ from pathlib import Path
 
 # ==============================================================================
 
-probe_names = [
+all_probe_names = [
     "WG01", "WG02", "WG03", "WG04",
     "WG05", "WG06", "WG07", "WG08", "WG09",
     "Mo01", "Mo02", "Mo03", "Mo04",
     "Mo05", "Mo06", "Mo07", "Mo08",
+    "WM", "L1", "L2", "L3",
+    "PS01", "PS02", "PS03", "PS04",
+    "PS05", "PS06", "PS07", "PS08",
+    "PS09", "PS10", "PS11", "PS12",
+    "PS13", "PS14", "PS15", "PS16",
+    "PS17", "PS18", "PS19", "PS20",
+    "PS21", "PS22", "PS23", "PS24",
     "LED-chan100" ]
 
 # ==============================================================================
@@ -33,17 +40,18 @@ def find_unique_file(
     matching the specified test name and extension. Expects exactly one match.
     
     Args:
-        root_dir: Root directory to start the recursive search from
-        testName: Test name pattern to match at the beginning of filenames
-        ext: File extension to match (default: "*" for any extension)
+    - root_dir: Root directory to start the recursive search from
+    - testName: Test name pattern to match at the beginning of filenames
+    - ext: File extension to match (default: "*" for any extension)
         
     Returns:
-        Path to the single file found matching the pattern
+    - Path to the single file found matching the pattern
         
     Raises:
-        ValueError: If no files or multiple files are found
+    - ValueError: If no files or multiple files are found
     
     Examples:
+
         >>> find_unique_file("/data", "experiment_001", "csv")
         '/data/experiment_001_results.csv'
         
@@ -71,11 +79,11 @@ def save_hdf5_mat(path: pathlib.Path, data: dict):
     """Save data to an HDF5 MATLAB file.
     
     Args:
-        path: Output file path.
-        data: Dictionary containing data to save.
+    - path: Output file path.
+    - data: Dictionary containing data to save.
         
     Raises:
-        Exception: If saving fails.
+    - Exception: If saving fails.
     """
     try:
         hdf5storage.savemat(
@@ -99,13 +107,13 @@ def load_hdf5_mat(path: pathlib.Path) -> dict:
     """Load data from an HDF5 MATLAB file.
     
     Args:
-        path: Input file path.
+    - path: Input file path.
 
     Returns:
-        Dictionary containing loaded data. Returns empty dict if loading fails.
+    - Dictionary containing loaded data. Returns empty dict if loading fails.
     
     Raises:
-        Exception: If loading fails.
+    - Exception: If loading fails.
     """
     try:
         print("\n=== Reading MAT ===")
@@ -128,14 +136,14 @@ def load_hdf5_mat(path: pathlib.Path) -> dict:
 # ==============================================================================
 
 def load_case(file,
-    *,probe_names=probe_names) -> dict:
+    *,probe_names=all_probe_names) -> dict:
     """
     Load a case from an HDF5 MAT file and convert probe data to xarray format.
     Args:
-        file: Path to the HDF5 MAT file to load.
-        probe_names: Names of probes to use when converting to xarray format.
+    - file: Path to the HDF5 MAT file to load.
+    - probe_names: Names of probes to use when converting to xarray format.
     Returns:
-        dict: Dictionary containing the loaded data, with DefaultData and MP3 entries
+    - dict: Dictionary containing the loaded data, with DefaultData and MP3 entries
               converted to xarray datasets, and other entries preserved as-is.
     """
 
@@ -159,16 +167,18 @@ def load_case(file,
 
 # ==============================================================================
 
-def convert_dict_to_xarray(ds: dict, * , probe_names = probe_names ) -> xr.Dataset:        
+def convert_dict_to_xarray(ds: dict, 
+    * , probe_names = all_probe_names ) -> xr.Dataset:        
     """
     Convert a dictionary to an xarray Dataset.
     
     Args:
-        ds: Dictionary containing time series data with 'Time' key and probe data
-        probe_names: List of probe names to be converted to data variables in the xarray Dataset
-            - Default value: predefined list of probe names
+    - ds: Dictionary containing time series data with 'Time' key and probe data
+    - probe_names: List of probe names to be converted to data variables in the xarray Dataset
+        - Default value: predefined list of probe names
+    
     Returns:
-        xr.Dataset: Dataset with Time coordinate, probe data as variables, and other keys as attributes
+    - xr.Dataset: Dataset with Time coordinate, probe data as variables, and other keys as attributes
     """
     
 
@@ -192,15 +202,15 @@ def cleanAttributes(l1: np.ndarray) -> dict:
     Flatten all arrays and convert the character arrays to strings.
     Needed because of the way HDF5 stores data.
     Additionaly export
-        - allAttributes: list of all attribute names
-        - convertedAttributes: list of attributes converted to strings
-        - unconvertedAttributes: list of attributes not converted to strings
+    - allAttributes: list of all attribute names
+    - convertedAttributes: list of attributes converted to strings
+    - unconvertedAttributes: list of attributes not converted to strings
 
     Args:
-        np.ndarray: Usually each struct in the .mat
+    - l1: np.ndarray, usually each struct in the .mat
     
     Returns:
-        dict: With all arrays flattened to 1D
+    - dict: With all arrays flattened to 1D
     """        
         
     l2 = {}

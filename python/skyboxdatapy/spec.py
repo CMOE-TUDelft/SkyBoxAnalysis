@@ -6,18 +6,18 @@ def get_single_sided_spectrum(wv_ele, fs):
 
     Parameters
     ----------
-    wv_ele : array-like
+    - wv_ele : array-like <br>
         Input signal samples (1D array).
-    fs : float
+    - fs : float <br>
         Sampling frequency of the input signal in Hz.
 
     Returns
     -------
-    fHalf : ndarray
+    - fHalf : ndarray <br>
         Array of frequency (Hz) for the single-sided spectrum.
-    fAmp : ndarray
+    - fAmp : ndarray <br>
         Single-sided amplitude spectrum of the input signal.
-    fS : ndarray
+    - fS : ndarray <br>
         Single-sided power spectral density (PSD) of the input signal.
 
     Notes
@@ -41,6 +41,15 @@ def get_single_sided_spectrum(wv_ele, fs):
     fAmp = fAmp[:sz // 2 + 1]
     fAmp[1:-1] = 2 * fAmp[1:-1]
     fHalf = fs * np.arange(sz // 2 + 1) / sz
+
+    # # Alternative code using rfft
+    # # I'll keep it commented since I like to know 
+    # # whats happening under the hood
+
+    # fAmp = np.fft.rfft(wg01)
+    # fAmp = np.abs(fAmp)/len(wg01)
+    # fAmp[1:-1] = 2 * fAmp[1:-1]
+    # fFreq = np.fft.rfftfreq(len(wg01), d=1/fSampling)
 
     fS = fAmp ** 2 / 2 / (fHalf[1] - fHalf[0])
 

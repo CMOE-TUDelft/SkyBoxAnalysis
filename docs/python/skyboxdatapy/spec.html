@@ -62,18 +62,18 @@
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">    Parameters</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="sd">    ----------</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="sd">    wv_ele : array-like</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="sd">    - wv_ele : array-like &lt;br&gt;</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="sd">        Input signal samples (1D array).</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="sd">    fs : float</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="sd">    - fs : float &lt;br&gt;</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">        Sampling frequency of the input signal in Hz.</span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>
 </span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="sd">    Returns</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">    -------</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="sd">    fHalf : ndarray</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="sd">    - fHalf : ndarray &lt;br&gt;</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="sd">        Array of frequency (Hz) for the single-sided spectrum.</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="sd">    fAmp : ndarray</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="sd">    - fAmp : ndarray &lt;br&gt;</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="sd">        Single-sided amplitude spectrum of the input signal.</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="sd">    fS : ndarray</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="sd">    - fS : ndarray &lt;br&gt;</span>
 </span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="sd">        Single-sided power spectral density (PSD) of the input signal.</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>
 </span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="sd">    Notes</span>
@@ -98,9 +98,18 @@
 </span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>    <span class="n">fAmp</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">fAmp</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 </span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>    <span class="n">fHalf</span> <span class="o">=</span> <span class="n">fs</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">sz</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">sz</span>
 </span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>
-</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>    <span class="n">fS</span> <span class="o">=</span> <span class="n">fAmp</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="n">fHalf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">fHalf</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>
-</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>    <span class="k">return</span> <span class="n">fHalf</span><span class="p">,</span> <span class="n">fAmp</span><span class="p">,</span> <span class="n">fS</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>    <span class="c1"># # Alternative code using rfft</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>    <span class="c1"># # I&#39;ll keep it commented since I like to know </span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>    <span class="c1"># # whats happening under the hood</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>    <span class="c1"># fAmp = np.fft.rfft(wg01)</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>    <span class="c1"># fAmp = np.abs(fAmp)/len(wg01)</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>    <span class="c1"># fAmp[1:-1] = 2 * fAmp[1:-1]</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>    <span class="c1"># fFreq = np.fft.rfftfreq(len(wg01), d=1/fSampling)</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>
+</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>    <span class="n">fS</span> <span class="o">=</span> <span class="n">fAmp</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="n">fHalf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">fHalf</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>    <span class="k">return</span> <span class="n">fHalf</span><span class="p">,</span> <span class="n">fAmp</span><span class="p">,</span> <span class="n">fS</span>
 </span></pre></div>
 
 
@@ -122,18 +131,18 @@
 </span><span id="get_single_sided_spectrum-7"><a href="#get_single_sided_spectrum-7"><span class="linenos"> 7</span></a>
 </span><span id="get_single_sided_spectrum-8"><a href="#get_single_sided_spectrum-8"><span class="linenos"> 8</span></a><span class="sd">    Parameters</span>
 </span><span id="get_single_sided_spectrum-9"><a href="#get_single_sided_spectrum-9"><span class="linenos"> 9</span></a><span class="sd">    ----------</span>
-</span><span id="get_single_sided_spectrum-10"><a href="#get_single_sided_spectrum-10"><span class="linenos">10</span></a><span class="sd">    wv_ele : array-like</span>
+</span><span id="get_single_sided_spectrum-10"><a href="#get_single_sided_spectrum-10"><span class="linenos">10</span></a><span class="sd">    - wv_ele : array-like &lt;br&gt;</span>
 </span><span id="get_single_sided_spectrum-11"><a href="#get_single_sided_spectrum-11"><span class="linenos">11</span></a><span class="sd">        Input signal samples (1D array).</span>
-</span><span id="get_single_sided_spectrum-12"><a href="#get_single_sided_spectrum-12"><span class="linenos">12</span></a><span class="sd">    fs : float</span>
+</span><span id="get_single_sided_spectrum-12"><a href="#get_single_sided_spectrum-12"><span class="linenos">12</span></a><span class="sd">    - fs : float &lt;br&gt;</span>
 </span><span id="get_single_sided_spectrum-13"><a href="#get_single_sided_spectrum-13"><span class="linenos">13</span></a><span class="sd">        Sampling frequency of the input signal in Hz.</span>
 </span><span id="get_single_sided_spectrum-14"><a href="#get_single_sided_spectrum-14"><span class="linenos">14</span></a>
 </span><span id="get_single_sided_spectrum-15"><a href="#get_single_sided_spectrum-15"><span class="linenos">15</span></a><span class="sd">    Returns</span>
 </span><span id="get_single_sided_spectrum-16"><a href="#get_single_sided_spectrum-16"><span class="linenos">16</span></a><span class="sd">    -------</span>
-</span><span id="get_single_sided_spectrum-17"><a href="#get_single_sided_spectrum-17"><span class="linenos">17</span></a><span class="sd">    fHalf : ndarray</span>
+</span><span id="get_single_sided_spectrum-17"><a href="#get_single_sided_spectrum-17"><span class="linenos">17</span></a><span class="sd">    - fHalf : ndarray &lt;br&gt;</span>
 </span><span id="get_single_sided_spectrum-18"><a href="#get_single_sided_spectrum-18"><span class="linenos">18</span></a><span class="sd">        Array of frequency (Hz) for the single-sided spectrum.</span>
-</span><span id="get_single_sided_spectrum-19"><a href="#get_single_sided_spectrum-19"><span class="linenos">19</span></a><span class="sd">    fAmp : ndarray</span>
+</span><span id="get_single_sided_spectrum-19"><a href="#get_single_sided_spectrum-19"><span class="linenos">19</span></a><span class="sd">    - fAmp : ndarray &lt;br&gt;</span>
 </span><span id="get_single_sided_spectrum-20"><a href="#get_single_sided_spectrum-20"><span class="linenos">20</span></a><span class="sd">        Single-sided amplitude spectrum of the input signal.</span>
-</span><span id="get_single_sided_spectrum-21"><a href="#get_single_sided_spectrum-21"><span class="linenos">21</span></a><span class="sd">    fS : ndarray</span>
+</span><span id="get_single_sided_spectrum-21"><a href="#get_single_sided_spectrum-21"><span class="linenos">21</span></a><span class="sd">    - fS : ndarray &lt;br&gt;</span>
 </span><span id="get_single_sided_spectrum-22"><a href="#get_single_sided_spectrum-22"><span class="linenos">22</span></a><span class="sd">        Single-sided power spectral density (PSD) of the input signal.</span>
 </span><span id="get_single_sided_spectrum-23"><a href="#get_single_sided_spectrum-23"><span class="linenos">23</span></a>
 </span><span id="get_single_sided_spectrum-24"><a href="#get_single_sided_spectrum-24"><span class="linenos">24</span></a><span class="sd">    Notes</span>
@@ -158,9 +167,18 @@
 </span><span id="get_single_sided_spectrum-43"><a href="#get_single_sided_spectrum-43"><span class="linenos">43</span></a>    <span class="n">fAmp</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">fAmp</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 </span><span id="get_single_sided_spectrum-44"><a href="#get_single_sided_spectrum-44"><span class="linenos">44</span></a>    <span class="n">fHalf</span> <span class="o">=</span> <span class="n">fs</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">sz</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">sz</span>
 </span><span id="get_single_sided_spectrum-45"><a href="#get_single_sided_spectrum-45"><span class="linenos">45</span></a>
-</span><span id="get_single_sided_spectrum-46"><a href="#get_single_sided_spectrum-46"><span class="linenos">46</span></a>    <span class="n">fS</span> <span class="o">=</span> <span class="n">fAmp</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="n">fHalf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">fHalf</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-</span><span id="get_single_sided_spectrum-47"><a href="#get_single_sided_spectrum-47"><span class="linenos">47</span></a>
-</span><span id="get_single_sided_spectrum-48"><a href="#get_single_sided_spectrum-48"><span class="linenos">48</span></a>    <span class="k">return</span> <span class="n">fHalf</span><span class="p">,</span> <span class="n">fAmp</span><span class="p">,</span> <span class="n">fS</span>
+</span><span id="get_single_sided_spectrum-46"><a href="#get_single_sided_spectrum-46"><span class="linenos">46</span></a>    <span class="c1"># # Alternative code using rfft</span>
+</span><span id="get_single_sided_spectrum-47"><a href="#get_single_sided_spectrum-47"><span class="linenos">47</span></a>    <span class="c1"># # I&#39;ll keep it commented since I like to know </span>
+</span><span id="get_single_sided_spectrum-48"><a href="#get_single_sided_spectrum-48"><span class="linenos">48</span></a>    <span class="c1"># # whats happening under the hood</span>
+</span><span id="get_single_sided_spectrum-49"><a href="#get_single_sided_spectrum-49"><span class="linenos">49</span></a>
+</span><span id="get_single_sided_spectrum-50"><a href="#get_single_sided_spectrum-50"><span class="linenos">50</span></a>    <span class="c1"># fAmp = np.fft.rfft(wg01)</span>
+</span><span id="get_single_sided_spectrum-51"><a href="#get_single_sided_spectrum-51"><span class="linenos">51</span></a>    <span class="c1"># fAmp = np.abs(fAmp)/len(wg01)</span>
+</span><span id="get_single_sided_spectrum-52"><a href="#get_single_sided_spectrum-52"><span class="linenos">52</span></a>    <span class="c1"># fAmp[1:-1] = 2 * fAmp[1:-1]</span>
+</span><span id="get_single_sided_spectrum-53"><a href="#get_single_sided_spectrum-53"><span class="linenos">53</span></a>    <span class="c1"># fFreq = np.fft.rfftfreq(len(wg01), d=1/fSampling)</span>
+</span><span id="get_single_sided_spectrum-54"><a href="#get_single_sided_spectrum-54"><span class="linenos">54</span></a>
+</span><span id="get_single_sided_spectrum-55"><a href="#get_single_sided_spectrum-55"><span class="linenos">55</span></a>    <span class="n">fS</span> <span class="o">=</span> <span class="n">fAmp</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="n">fHalf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">fHalf</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span><span id="get_single_sided_spectrum-56"><a href="#get_single_sided_spectrum-56"><span class="linenos">56</span></a>
+</span><span id="get_single_sided_spectrum-57"><a href="#get_single_sided_spectrum-57"><span class="linenos">57</span></a>    <span class="k">return</span> <span class="n">fHalf</span><span class="p">,</span> <span class="n">fAmp</span><span class="p">,</span> <span class="n">fS</span>
 </span></pre></div>
 
 
@@ -168,19 +186,23 @@
 
 <h2 id="parameters">Parameters</h2>
 
-<p>wv_ele : array-like
-    Input signal samples (1D array).
-fs : float
-    Sampling frequency of the input signal in Hz.</p>
+<ul>
+<li>wv_ele : array-like <br>
+Input signal samples (1D array).</li>
+<li>fs : float <br>
+Sampling frequency of the input signal in Hz.</li>
+</ul>
 
 <h2 id="returns">Returns</h2>
 
-<p>fHalf : ndarray
-    Array of frequency (Hz) for the single-sided spectrum.
-fAmp : ndarray
-    Single-sided amplitude spectrum of the input signal.
-fS : ndarray
-    Single-sided power spectral density (PSD) of the input signal.</p>
+<ul>
+<li>fHalf : ndarray <br>
+Array of frequency (Hz) for the single-sided spectrum.</li>
+<li>fAmp : ndarray <br>
+Single-sided amplitude spectrum of the input signal.</li>
+<li>fS : ndarray <br>
+Single-sided power spectral density (PSD) of the input signal.</li>
+</ul>
 
 <h2 id="notes">Notes</h2>
 
