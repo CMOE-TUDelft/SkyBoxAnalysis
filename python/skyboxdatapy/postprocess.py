@@ -1,5 +1,7 @@
 import numpy as np
 import xarray as xr
+import scipy as sp
+import matplotlib.pyplot as plt
 
 # ==============================================================================
 
@@ -137,3 +139,206 @@ def set_probe_tare(dsIn: xr.Dataset, probe, start_time, end_time):
     dsOut.attrs['tare_values'] = tv
 
     return dsOut
+
+# ==============================================================================
+
+def sync_signals_crosscorr_downsample( da1 : xr.DataArray, fSampling1, da2 : xr.DataArray, fSampling2, plotflag = False):
+    """
+    Synchronize two signals using cross-correlation.
+    If the sampling frequencies differ, downsample both signals to the minimum frequency.
+    
+    Parameters
+    ----------
+    - da1 : xr.DataArray
+        - First signal to be synchronized.
+    - fSampling1 : float
+        - Sampling frequency of the first signal (in Hz).    
+    - da2 : xr.DataArray
+        - Second signal to be synchronized.
+    - fSampling2 : float
+        - Sampling frequency of the second signal (in Hz).        
+    - plotflag : bool, optional
+        - If True, plot the cross-correlation result. Default is False.
+    
+    Returns
+    -------
+    - float
+        - Time shift to apply to ds2 to synchronize with ds1.
+    """
+
+    
+    # Convert Time from Float64 to timedelta64[ns] to enable resampling
+    da1_resampled = da1.assign_coords(
+        Time_ns = (da1.Time * 1e9).astype('timedelta64[ns]') )
+    da2_resampled = da2.assign_coords(
+        Time_ns = (da2.Time * 1e9).astype('timedelta64[ns]') )
+    
+    fSampling = fSampling1 # Default    
+
+    if fSampling1 != fSampling2:
+        fSampling = min(fSampling1, fSampling2)
+        dt_ns = 1/fSampling*1e9 # in ns
+        print(f"Warning: Sampling frequencies differ. Using minimum: {fSampling} Hz, dt = {dt_ns} ns")
+
+        if fSampling1 != fSampling:                                            
+            da1_resampled = da1_resampled.resample(Time_ns=f'{dt_ns}ns').mean()
+            da1_resampled = da1_resampled.assign_coords(
+                Time = (da1_resampled.Time_ns / np.timedelta64(1, 's')).astype('float64') )
+
+        if fSampling2 != fSampling:    
+            da2_resampled = da2_resampled.resample(Time_ns=f'{dt_ns}ns').mean()
+            da2_resampled = da2_resampled.assign_coords(
+                Time = (da2_resampled.Time_ns / np.timedelta64(1, 's')).astype('float64') )
+    
+
+    dt = 1/fSampling
+
+    sig1 = da1_resampled.values
+    sig2 = da2_resampled.values
+
+    n1 = len(sig1)
+    n2 = len(sig2)
+
+    N = min(n1, n2)
+    sig1 = sig1[0:N]
+    sig2 = sig2[0:N]
+
+    corr = sp.signal.correlate(sig1 - np.mean(sig1), sig2 - np.mean(sig2), mode='full')
+    lags = sp.signal.correlation_lags(N, N, mode='full')
+
+    lag_maxCorr = lags[np.argmax(corr)]
+    tShift_maxCorr = lag_maxCorr * dt
+
+    lag_mat_peaks, _ = sp.signal.find_peaks(corr, 
+        height=np.max(corr)*0.9)
+    tShift_array = lags[lag_mat_peaks]*dt
+    print(f"Peaks in cross-corr: {tShift_array}")
+
+
+    if(plotflag):
+        plt.figure(figsize=(10, 4))
+        # da1_use.plot(x='Time', label='Signal 1')
+        # da2_use.plot(x='Time', label='Signal 2')
+        plt.plot(da1_resampled.Time[0:N], sig1, label='Signal 1')
+        plt.plot(da2_resampled.Time[0:N], sig2, label='Signal 2')
+        plt.title('Resampled Signals')
+        plt.xlabel('Time (s)')
+        plt.ylabel('Amplitude')
+        plt.legend()
+        plt.grid()
+        plt.show()
+
+        plt.figure(figsize=(10, 4))
+        plt.plot(lags * dt, corr)
+        plt.scatter(tShift_array, corr[lag_mat_peaks], color='orange', label='Peaks')
+        plt.title('Cross-correlation between signals')
+        plt.xlabel('Lag (s)')
+        plt.ylabel('Correlation')
+        plt.axvline(x=tShift_maxCorr, color='r', linestyle='--', label=f'Max corr at Shift: {tShift_maxCorr:.4f} s')
+        plt.legend()
+        plt.grid()
+        plt.show()
+
+    return tShift_maxCorr, tShift_array
+
+
+# ==============================================================================
+
+def sync_signals_crosscorr_upsample( da1 : xr.DataArray, fSampling1, da2 : xr.DataArray, fSampling2, plotflag = False):
+    """
+    Synchronize two signals using cross-correlation.
+    If the sampling frequencies differ, upsample both signals to the maximum frequency.
+    I upsample to get a better resolution in the lag estimation.
+    
+    Parameters
+    ----------
+    - da1 : xr.DataArray
+        - First signal to be synchronized.
+    - fSampling1 : float
+        - Sampling frequency of the first signal (in Hz).    
+    - da2 : xr.DataArray
+        - Second signal to be synchronized.
+    - fSampling2 : float
+        - Sampling frequency of the second signal (in Hz).        
+    - plotflag : bool, optional
+        - If True, plot the cross-correlation result. Default is False.
+    
+    Returns
+    -------
+    - float
+        - Time shift to apply to ds2 to synchronize with ds1.
+    """
+
+    
+    da1_use = da1.copy()
+    da2_use = da2.copy()
+    
+    fSampling = fSampling1 # Default    
+
+
+    if fSampling1 != fSampling2:
+        fSampling = max(fSampling1, fSampling2)        
+        dt = 1/fSampling
+        print(f"Warning: Sampling frequencies differ. Using maximum: {fSampling} Hz, dt = {dt} ns")        
+
+        if fSampling1 != fSampling:                                            
+            tArray = np.arange(da1.Time.min(), da1.Time.max(), 1/fSampling)
+            da1_use = da1.interp(Time=tArray, method = 'linear')
+
+        if fSampling2 != fSampling:    
+            tArray = np.arange(da2.Time.min(), da2.Time.max(), 1/fSampling)
+            da2_use = da2.interp(Time=tArray, method = 'linear')
+    
+
+    dt = 1/fSampling
+
+    sig1 = da1_use.values
+    sig2 = da2_use.values
+
+    n1 = len(sig1)
+    n2 = len(sig2)
+
+    N = min(n1, n2)
+    sig1 = sig1[0:N]
+    sig2 = sig2[0:N]
+
+    corr = sp.signal.correlate(sig1 - np.mean(sig1), sig2 - np.mean(sig2), mode='full')
+    lags = sp.signal.correlation_lags(N, N, mode='full')
+
+    lag_maxCorr = lags[np.argmax(corr)]
+    tShift_maxCorr = lag_maxCorr * dt
+
+    lag_mat_peaks, _ = sp.signal.find_peaks(corr, 
+        height=np.max(corr)*0.9)
+    tShift_array = lags[lag_mat_peaks]*dt
+    print(f"Peaks in cross-corr: {tShift_array}")
+
+
+    if(plotflag):
+        plt.figure(figsize=(10, 4))
+        # da1_use.plot(x='Time', label='Signal 1')
+        # da2_use.plot(x='Time', label='Signal 2')
+        plt.plot(da1_use.Time[0:N], sig1, label='Signal 1')
+        plt.plot(da2_use.Time[0:N], sig2, label='Signal 2')
+        plt.title('Resampled Signals')
+        plt.xlabel('Time (s)')
+        plt.ylabel('Amplitude')
+        plt.legend()
+        plt.grid()
+        plt.show()
+
+        plt.figure(figsize=(10, 4))
+        plt.plot(lags * dt, corr)
+        plt.scatter(tShift_array, corr[lag_mat_peaks], color='orange', label='Peaks')
+        plt.title('Cross-correlation between signals')
+        plt.xlabel('Lag (s)')
+        plt.ylabel('Correlation')
+        plt.axvline(x=tShift_maxCorr, color='r', linestyle='--', label=f'Max corr at Shift: {tShift_maxCorr:.4f} s')
+        plt.legend()
+        plt.grid()
+        plt.show()
+
+    return tShift_maxCorr, tShift_array
+
+
+     
